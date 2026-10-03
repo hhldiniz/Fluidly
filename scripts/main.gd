@@ -41,6 +41,8 @@ var _pour_to: Bottle
 @onready var win_overlay: Control = %WinOverlay
 @onready var win_label: Label = %WinLabel
 @onready var next_button: Button = %NextButton
+@onready var sound_button: Button = %SoundButton
+@onready var sfx: Sfx = $Sfx
 
 
 func _ready() -> void:
@@ -48,8 +50,11 @@ func _ready() -> void:
 	restart_button.pressed.connect(_restart)
 	hint_button.pressed.connect(_show_hint)
 	next_button.pressed.connect(func() -> void: _start_level(level + 1))
+	sound_button.pressed.connect(_toggle_sound)
 	get_viewport().size_changed.connect(_on_viewport_resized)
-	_start_level(_level_from_url() if _level_from_url() > 0 else _load_level())
+	_set_muted(bool(_load_setting("settings", "muted", false)))
+	var url_level := _level_from_url()
+	_start_level(url_level if url_level > 0 else int(_load_setting("progress", "level", 1)))
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -63,6 +68,8 @@ func _unhandled_input(event: InputEvent) -> void:
 				_restart()
 			KEY_H:
 				_show_hint()
+			KEY_M:
+				_toggle_sound()
 			KEY_ENTER, KEY_KP_ENTER, KEY_SPACE:
 				if won:
 					_start_level(level + 1)
@@ -110,8 +117,8 @@ func _undo() -> void:
 	state = history.pop_back()
 	moves -= 1
 	_select(-1)
-	_clear_hint()
 	_refresh()
+	sfx.play(&"pick", 0.8)
 	status_label.text = ""
 
 
@@ -122,6 +129,7 @@ func _check_finished() -> void:
 		win_label.text = "Level %d complete!\nSolved in %d moves." % [level, moves]
 		win_overlay.visible = true
 		next_button.grab_focus()
+		get_tree().create_timer(0.25).timeout.connect(sfx.play.bind(&"victory"))
 	elif not Puzzle.has_any_move(state):
 		status_label.text = "No moves left. Undo or restart."
 
@@ -133,19 +141,26 @@ func _on_tap(pos: Vector2) -> void:
 		return
 	var tapped := _bottle_at(pos)
 	if tapped == -1 or tapped == selected:
+		if selected != -1:
+			sfx.play(&"pick", 0.85, -4.0)
 		_select(-1)
 	elif selected == -1:
 		if state[tapped].is_empty() or Puzzle.is_complete(state[tapped]):
 			_shake(tapped)
 		else:
-			_select(tapped)
+			_pick_up(tapped)
 	elif Puzzle.can_pour(state, selected, tapped):
 		_pour(selected, tapped)
 	elif state[tapped].is_empty() or Puzzle.is_complete(state[tapped]):
 		_shake(tapped)
 	else:
 		# Not a valid target: pick it up instead.
-		_select(tapped)
+		_pick_up(tapped)
+
+
+func _pick_up(index: int) -> void:
+	_select(index)
+	sfx.play(&"pick", randf_range(0.96, 1.06))
 
 
 func _bottle_at(pos: Vector2) -> int:
@@ -175,6 +190,7 @@ func _move_bottle(index: int, to: Vector2) -> void:
 
 
 func _shake(index: int) -> void:
+	sfx.play(&"invalid")
 	var bottle := bottles[index]
 	var home := homes[index]
 	var tween := create_tween()
@@ -222,12 +238,17 @@ func _pour(from: int, to: int) -> void:
 		to_local(dst.to_global(Vector2(0, dst.surface_y(state[to].size() - amount)))),
 	])
 	stream.visible = true
+	# The bubbles sound higher as the target bottle fills up.
+	var pour_sound := sfx.play(&"pour", 1.0 + 0.08 * (state[to].size() - amount))
 	tween = create_tween()
 	tween.tween_method(_set_pour_progress, 0.0, 1.0, 0.15 + 0.12 * amount)
 	await tween.finished
 	stream.visible = false
+	sfx.fade_out(pour_sound, &"pour")
 	src.anim_units = 0
 	dst.anim_units = 0
+	if Puzzle.is_complete(state[to]):
+		sfx.play(&"cork")
 
 	# Swing back.
 	tween = create_tween().set_parallel().set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
@@ -257,7 +278,7 @@ func _show_hint() -> void:
 		status_label.text = "No solution from here. Try undo or restart."
 	elif not solution.is_empty():
 		var move: Vector2i = solution[0]
-		_select(move.x)
+		_pick_up(move.x)
 		bottles[move.y].hint = true
 		status_label.text = "Hint: pour the raised bottle into the glowing one."
 
@@ -348,15 +369,29 @@ func _level_from_url() -> int:
 	return int(value) if value is String and value.is_valid_int() else 0
 
 
-func _load_level() -> int:
-	var cfg := ConfigFile.new()
-	if cfg.load(SAVE_PATH) == OK:
-		return int(cfg.get_value("progress", "level", 1))
-	return 1
+func _toggle_sound() -> void:
+	_set_muted(not sfx.muted)
+	_save_setting("settings", "muted", sfx.muted)
+
+
+func _set_muted(value: bool) -> void:
+	sfx.muted = value
+	sound_button.text = "Sound: Off" if value else "Sound: On"
 
 
 func _save_level(value := level) -> void:
+	_save_setting("progress", "level", value)
+
+
+func _load_setting(section: String, key: String, default: Variant) -> Variant:
+	var cfg := ConfigFile.new()
+	if cfg.load(SAVE_PATH) == OK:
+		return cfg.get_value(section, key, default)
+	return default
+
+
+func _save_setting(section: String, key: String, value: Variant) -> void:
 	var cfg := ConfigFile.new()
 	cfg.load(SAVE_PATH)
-	cfg.set_value("progress", "level", value)
+	cfg.set_value(section, key, value)
 	cfg.save(SAVE_PATH)
