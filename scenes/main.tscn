@@ -1,7 +1,26 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="Script" path="res://scripts/sfx.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/toast.gd" id="3"]
+
+[sub_resource type="StyleBoxFlat" id="ToastStyle"]
+content_margin_left = 28.0
+content_margin_top = 16.0
+content_margin_right = 28.0
+content_margin_bottom = 16.0
+bg_color = Color(0.07, 0.12, 0.21, 0.92)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.75, 0.95, 0.55)
+corner_radius_top_left = 26
+corner_radius_top_right = 26
+corner_radius_bottom_right = 26
+corner_radius_bottom_left = 26
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 12
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1")
@@ -55,14 +74,6 @@ theme_override_font_sizes/font_size = 30
 text = "Moves: 0"
 horizontal_alignment = 2
 
-[node name="StatusLabel" type="Label" parent="HUD/Margin/Layout"]
-unique_name_in_owner = true
-layout_mode = 2
-theme_override_colors/font_color = Color(0.75, 0.86, 0.96, 1)
-theme_override_font_sizes/font_size = 20
-horizontal_alignment = 1
-autowrap_mode = 3
-
 [node name="Spacer" type="Control" parent="HUD/Margin/Layout"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -105,6 +116,22 @@ layout_mode = 2
 focus_mode = 0
 theme_override_font_sizes/font_size = 24
 text = "Sound: On"
+
+[node name="Toast" type="PanelContainer" parent="HUD"]
+unique_name_in_owner = true
+visible = false
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("ToastStyle")
+script = ExtResource("3")
+
+[node name="Label" type="Label" parent="HUD/Toast"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 26
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="WinOverlay" type="ColorRect" parent="HUD"]
 unique_name_in_owner = true

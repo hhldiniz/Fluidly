@@ -4,7 +4,7 @@ extends Node2D
 ## The level is won when every bottle holds a single color.
 
 const SAVE_PATH := "user://fluidly.cfg"
-const TOP_MARGIN := 96.0
+const TOP_MARGIN := 80.0
 const BOTTOM_MARGIN := 104.0
 const SIDE_MARGIN := 16.0
 ## Space reserved around each bottle (relative to its size) for spacing, lift and cork.
@@ -34,7 +34,7 @@ var _pour_to: Bottle
 @onready var stream: Line2D = $Stream
 @onready var level_label: Label = %LevelLabel
 @onready var moves_label: Label = %MovesLabel
-@onready var status_label: Label = %StatusLabel
+@onready var toast: Toast = %Toast
 @onready var undo_button: Button = %UndoButton
 @onready var restart_button: Button = %RestartButton
 @onready var hint_button: Button = %HintButton
@@ -102,7 +102,7 @@ func _reset_to(start: Array) -> void:
 		bottle.hint = false
 	_layout()
 	_refresh()
-	status_label.text = "Tap a bottle, then tap where to pour it."
+	toast.show_message("Tap a bottle, then tap where to pour it.")
 
 
 func _restart() -> void:
@@ -119,7 +119,7 @@ func _undo() -> void:
 	_select(-1)
 	_refresh()
 	sfx.play(&"pick", 0.8)
-	status_label.text = ""
+	toast.hide_message()
 
 
 func _check_finished() -> void:
@@ -131,7 +131,7 @@ func _check_finished() -> void:
 		next_button.grab_focus()
 		get_tree().create_timer(0.25).timeout.connect(sfx.play.bind(&"victory"))
 	elif not Puzzle.has_any_move(state):
-		status_label.text = "No moves left. Undo or restart."
+		toast.show_message("No moves left. Undo or restart.", 0.0)
 
 
 # --- Interaction ------------------------------------------------------------
@@ -201,7 +201,7 @@ func _shake(index: int) -> void:
 func _pour(from: int, to: int) -> void:
 	busy = true
 	_clear_hint()
-	status_label.text = ""
+	toast.hide_message()
 	var src := bottles[from]
 	var dst := bottles[to]
 	var color: int = state[from].back()
@@ -275,12 +275,12 @@ func _show_hint() -> void:
 		return
 	var solution = Solver.solve(state, 60000)
 	if solution == null:
-		status_label.text = "No solution from here. Try undo or restart."
+		toast.show_message("No solution from here. Try undo or restart.")
 	elif not solution.is_empty():
 		var move: Vector2i = solution[0]
 		_pick_up(move.x)
 		bottles[move.y].hint = true
-		status_label.text = "Hint: pour the raised bottle into the glowing one."
+		toast.show_message("Hint: pour the raised bottle into the glowing one.")
 
 
 func _clear_hint() -> void:
