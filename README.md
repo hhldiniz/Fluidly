@@ -16,6 +16,18 @@ Pour colored liquids between bottles until every bottle holds a single color. Li
 Levels get harder as you go, from 3 colors up to 12. Every level is generated from its number and
 checked by a solver, so each level is always the same and always solvable. Your progress is saved in the browser.
 
+## Sound
+
+Picking up a bottle clinks, pouring bubbles (higher-pitched as the target fills up), finishing a bottle pops its
+cork with a chime, and solving a level plays a short jingle. Invalid moves give a soft bonk.
+
+All sounds are synthesized by `tools/generate_sounds.py` (Python standard library only) into `audio/`.
+Edit that script and re-run it to change them:
+
+```sh
+python3 tools/generate_sounds.py
+```
+
 ## Controls
 
 | Input | Action |
@@ -24,6 +36,7 @@ checked by a solver, so each level is always the same and always solvable. Your 
 | Undo button, `Z` or `Backspace` | Undo the last pour |
 | Restart button or `R` | Restart the level |
 | Hint button or `H` | Raise the bottle to pour from and highlight where to pour it |
+| Sound button or `M` | Mute or unmute (remembered between visits) |
 | `Enter` / `Space` on the win screen | Next level |
 
 On the web build, add `?level=N` to the URL to open a specific level, for example `index.html?level=12`.
@@ -39,11 +52,14 @@ scripts/solver.gd          Depth-first solver used for level validation and hint
 scripts/level_generator.gd Deterministic, solvable level generation
 scripts/bottle.gd          Bottle rendering and pour animation
 scripts/main.gd            Game flow, input, layout, undo and saving
+scripts/sfx.gd             Sound effect playback and mute
+audio/                     Generated sound effects (see tools/generate_sounds.py)
+tools/generate_sounds.py   Synthesizes the sound effects
 tests/run_tests.gd         Headless tests for the rules, solver and generator
 .github/workflows/         CI that tests, exports and deploys to GitHub Pages
 ```
 
-All graphics are drawn in code, so there are no external assets.
+All graphics are drawn in code and all sounds are synthesized, so there are no external assets.
 
 ## Run locally
 

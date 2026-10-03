@@ -8,6 +8,7 @@ var _failures := 0
 func _init() -> void:
 	_test_rules()
 	_test_generated_levels()
+	_test_sounds()
 	print("FAILED: %d check(s)" % _failures if _failures else "All tests passed")
 	quit(_failures)
 
@@ -65,3 +66,9 @@ func _test_generated_levels() -> void:
 				Puzzle.pour(state, move.x, move.y)
 			_check(Puzzle.is_solved(state), "level %d solution solves it" % level)
 	print("Generated and verified 30 levels in %d ms" % (Time.get_ticks_msec() - started))
+
+
+func _test_sounds() -> void:
+	for sound in Sfx.SOUNDS:
+		var stream: AudioStream = Sfx.SOUNDS[sound]
+		_check(stream != null and stream.get_length() > 0.1, "sound %s loads" % sound)
