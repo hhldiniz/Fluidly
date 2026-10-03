@@ -101,21 +101,5 @@ func _draw() -> void:
 		draw_rect(Rect2(cork.position + Vector2(0, 8), Vector2(cork.size.x, 4)), Color(0.55, 0.36, 0.2))
 
 
-## Liquid bands as [color, height in units], bottom -> top, merging equal colors.
 func _bands() -> Array:
-	var bands := []
-	for i in layers.size():
-		var amount := 1.0
-		if anim_units > 0 and i >= layers.size() - anim_units:
-			amount = anim_frac
-		_add_band(bands, layers[i], amount)
-	if anim_units < 0:
-		_add_band(bands, anim_color, -anim_units * anim_frac)
-	return bands
-
-
-static func _add_band(bands: Array, color: int, amount: float) -> void:
-	if not bands.is_empty() and bands.back()[0] == color:
-		bands.back()[1] += amount
-	else:
-		bands.append([color, amount])
+	return BoardView.bands(layers, anim_units, anim_color, anim_frac)
