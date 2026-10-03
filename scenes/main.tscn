@@ -1,0 +1,54 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/droplet.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/hazard.tscn" id="4"]
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1")
+droplet_scene = ExtResource("3")
+hazard_scene = ExtResource("4")
+
+[node name="Player" parent="." instance=ExtResource("2")]
+position = Vector2(640, 360)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="ScoreLabel" type="Label" parent="HUD"]
+offset_left = 24.0
+offset_top = 16.0
+offset_right = 400.0
+offset_bottom = 56.0
+theme_override_font_sizes/font_size = 28
+text = "Score: 0"
+
+[node name="BestLabel" type="Label" parent="HUD"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -400.0
+offset_top = 16.0
+offset_right = -24.0
+offset_bottom = 56.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 28
+text = "Best: 0"
+horizontal_alignment = 2
+
+[node name="MessageLabel" type="Label" parent="HUD"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -420.0
+offset_top = -90.0
+offset_right = 420.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 36
+text = "Fluidly"
+horizontal_alignment = 1
+vertical_alignment = 1
