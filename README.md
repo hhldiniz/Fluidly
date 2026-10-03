@@ -1,27 +1,46 @@
 # Fluidly
 
-A small 2D game made with [Godot 4.4](https://godotengine.org) that runs in the browser (Web export, WebGL 2 / Compatibility renderer).
+A color-sorting puzzle made with [Godot 4.4](https://godotengine.org) that runs in the browser
+(Web export, WebGL 2 / Compatibility renderer).
 
-You are a drop of water. Collect droplets to grow, and dodge the embers that appear as your score climbs.
+Pour colored liquids between bottles until every bottle holds a single color. Liquids never mix.
+
+## Rules
+
+- Each bottle holds 4 units of liquid. Every color has exactly 4 units, and there are 2 extra empty bottles.
+- Tap a bottle to pick it up, then tap another bottle to pour into it.
+- You can only pour onto the **same color** or into an **empty bottle**.
+- A pour moves the whole top band of one color, or as much of it as fits.
+- The level is complete when every bottle is either empty or full of a single color.
+
+Levels get harder as you go, from 3 colors up to 12. Every level is generated from its number and
+checked by a solver, so each level is always the same and always solvable. Your progress is saved in the browser.
 
 ## Controls
 
 | Input | Action |
 | --- | --- |
-| Arrow keys / WASD | Move |
-| Hold mouse button / touch | Glide toward the pointer |
-| Space / Enter / click / tap | Start or restart |
+| Click / tap a bottle | Pick it up, or pour the raised bottle into it |
+| Undo button, `Z` or `Backspace` | Undo the last pour |
+| Restart button or `R` | Restart the level |
+| Hint button or `H` | Raise the bottle to pour from and highlight where to pour it |
+| `Enter` / `Space` on the win screen | Next level |
 
-The best score is stored locally in the browser.
+On the web build, add `?level=N` to the URL to open a specific level, for example `index.html?level=12`.
 
 ## Project layout
 
 ```
-project.godot          Godot project settings (1280x720, Compatibility renderer)
-export_presets.cfg     "Web" export preset (single-threaded, works on any static host)
-scenes/                main, player, droplet and hazard scenes
-scripts/               GDScript for each scene
-.github/workflows/     CI that exports the game and deploys it to GitHub Pages
+project.godot              Project settings (Compatibility renderer, "expand" stretch for any screen shape)
+export_presets.cfg         "Web" export preset (single-threaded, works on any static host)
+scenes/main.tscn           Game scene and HUD
+scripts/puzzle.gd          Puzzle rules: pouring, win and stuck detection
+scripts/solver.gd          Depth-first solver used for level validation and hints
+scripts/level_generator.gd Deterministic, solvable level generation
+scripts/bottle.gd          Bottle rendering and pour animation
+scripts/main.gd            Game flow, input, layout, undo and saving
+tests/run_tests.gd         Headless tests for the rules, solver and generator
+.github/workflows/         CI that tests, exports and deploys to GitHub Pages
 ```
 
 All graphics are drawn in code, so there are no external assets.
@@ -30,6 +49,16 @@ All graphics are drawn in code, so there are no external assets.
 
 1. Install [Godot 4.4.x](https://godotengine.org/download) (standard build, not .NET).
 2. Open the project (`project.godot`) in the editor and press **F5**.
+
+## Tests
+
+```sh
+godot --headless --import
+godot --headless -s res://tests/run_tests.gd
+```
+
+The script exits with the number of failed checks. It verifies the pouring rules, and checks that
+levels 1–30 are deterministic, use each color exactly 4 times and can be solved.
 
 ## Export for the web
 
@@ -51,6 +80,6 @@ and open <http://localhost:8060>. The export is single-threaded, so it does not 
 
 ## Deployment
 
-Pushing to `main` or `master` runs `.github/workflows/deploy.yml`, which exports the game and
+Pushing to `main` or `master` runs `.github/workflows/deploy.yml`, which runs the tests, exports the game and
 publishes it with GitHub Pages. Enable it once under **Settings → Pages → Source: GitHub Actions**.
-Pull requests only run the export to verify that the project still builds.
+Pull requests only run the tests and the export, to check that the project still builds.

@@ -1,54 +1,133 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2"]
-[ext_resource type="PackedScene" path="res://scenes/droplet.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://scenes/hazard.tscn" id="4"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1")
-droplet_scene = ExtResource("3")
-hazard_scene = ExtResource("4")
 
-[node name="Player" parent="." instance=ExtResource("2")]
-position = Vector2(640, 360)
+[node name="Bottles" type="Node2D" parent="."]
+
+[node name="Stream" type="Line2D" parent="."]
+visible = false
+z_index = 2
+width = 7.0
+begin_cap_mode = 2
+end_cap_mode = 2
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
-[node name="ScoreLabel" type="Label" parent="HUD"]
-offset_left = 24.0
-offset_top = 16.0
-offset_right = 400.0
-offset_bottom = 56.0
-theme_override_font_sizes/font_size = 28
-text = "Score: 0"
-
-[node name="BestLabel" type="Label" parent="HUD"]
-anchors_preset = 1
-anchor_left = 1.0
+[node name="Margin" type="MarginContainer" parent="HUD"]
+anchors_preset = 15
 anchor_right = 1.0
-offset_left = -400.0
-offset_top = 16.0
-offset_right = -24.0
-offset_bottom = 56.0
-grow_horizontal = 0
-theme_override_font_sizes/font_size = 28
-text = "Best: 0"
-horizontal_alignment = 2
-
-[node name="MessageLabel" type="Label" parent="HUD"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -420.0
-offset_top = -90.0
-offset_right = 420.0
-offset_bottom = 90.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 36
-text = "Fluidly"
+mouse_filter = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="Layout" type="VBoxContainer" parent="HUD/Margin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TopBar" type="HBoxContainer" parent="HUD/Margin/Layout"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="LevelLabel" type="Label" parent="HUD/Margin/Layout/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "Level 1"
+
+[node name="MovesLabel" type="Label" parent="HUD/Margin/Layout/TopBar"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 30
+text = "Moves: 0"
+horizontal_alignment = 2
+
+[node name="StatusLabel" type="Label" parent="HUD/Margin/Layout"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.86, 0.96, 1)
+theme_override_font_sizes/font_size = 20
 horizontal_alignment = 1
-vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Spacer" type="Control" parent="HUD/Margin/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="BottomBar" type="HBoxContainer" parent="HUD/Margin/Layout"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="UndoButton" type="Button" parent="HUD/Margin/Layout/BottomBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 60)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 24
+text = "Undo"
+
+[node name="RestartButton" type="Button" parent="HUD/Margin/Layout/BottomBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 60)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 24
+text = "Restart"
+
+[node name="HintButton" type="Button" parent="HUD/Margin/Layout/BottomBar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 60)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 24
+text = "Hint"
+
+[node name="WinOverlay" type="ColorRect" parent="HUD"]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.04, 0.09, 0.7)
+
+[node name="Center" type="CenterContainer" parent="HUD/WinOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Box" type="VBoxContainer" parent="HUD/WinOverlay/Center"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="WinLabel" type="Label" parent="HUD/WinOverlay/Center/Box"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Level complete!"
+horizontal_alignment = 1
+
+[node name="NextButton" type="Button" parent="HUD/WinOverlay/Center/Box"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(240, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 28
+text = "Next level"
