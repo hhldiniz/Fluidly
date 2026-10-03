@@ -1,0 +1,10 @@
+# Godot 4+ specific ignores
+.godot/
+.nomedia
+
+# Web export output
+build/
+
+# OS / editor
+.DS_Store
+*.tmp
