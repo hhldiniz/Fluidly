@@ -9,6 +9,8 @@ func _init() -> void:
 	_test_rules()
 	_test_generated_levels()
 	_test_sounds()
+	_test_bands()
+	await _test_views()
 	print("FAILED: %d check(s)" % _failures if _failures else "All tests passed")
 	quit(_failures)
 
@@ -72,3 +74,36 @@ func _test_sounds() -> void:
 	for sound in Sfx.SOUNDS:
 		var stream: AudioStream = Sfx.SOUNDS[sound]
 		_check(stream != null and stream.get_length() > 0.1, "sound %s loads" % sound)
+
+
+func _test_bands() -> void:
+	_check(BoardView.bands([0, 0, 1]) == [[0, 2.0], [1, 1.0]], "equal colors merge into one band")
+	_check(BoardView.bands([0, 1, 1], 2, 0, 0.5) == [[0, 1.0], [1, 1.0]], "incoming units are scaled")
+	_check(BoardView.bands([0], -2, 3, 0.5) == [[0, 1.0], [3, 1.0]], "outgoing units are drawn on top")
+
+
+## Plays a real pour in both the 2D and the 3D view and checks hit-testing.
+func _test_views() -> void:
+	var main = load("res://scenes/main.tscn").instantiate()
+	root.add_child(main)
+	await process_frame
+	for mode in ["2d", "3d"]:
+		main._choose_graphics(mode)
+		main._start_level(5)
+		await process_frame
+		var view: BoardView = main.view
+		_check(main.graphics == mode, "%s view is active" % mode)
+		for i in main.state.size():
+			var home: Vector2
+			if view is View3D:
+				home = view._camera.unproject_position(view.homes[i] + Vector3(0, 1.0, 0))
+			else:
+				home = view.homes[i]
+			_check(view.bottle_at(home) == i, "%s: tapping bottle %d hits it" % [mode, i])
+		var move: Vector2i = Solver.solve(main.state)[0]
+		var expected := Puzzle.copy(main.state)
+		Puzzle.pour(expected, move.x, move.y)
+		await main._pour(move.x, move.y)
+		_check(main.state == expected and main.moves == 1, "%s: pour updates the state" % mode)
+		_check(not main.busy, "%s: pour animation finishes" % mode)
+	main.queue_free()
