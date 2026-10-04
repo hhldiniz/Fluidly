@@ -1,5 +1,64 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
-  <rect width="128" height="128" rx="24" fill="#0d1729"/>
-  <path d="M64 18 C64 18 28 58 28 80 a36 36 0 0 0 72 0 C100 58 64 18 64 18 Z" fill="#4cc9f0"/>
-  <path d="M48 82 a16 16 0 0 0 14 16" fill="none" stroke="#e0fbff" stroke-width="6" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16305a"/>
+      <stop offset="1" stop-color="#0a1426"/>
+    </linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.18"/>
+      <stop offset="0.45" stop-color="#fff" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.22"/>
+    </linearGradient>
+    <!-- Inside of a tube: 44 wide, flat top at y=60, round bottom ending at y=200. -->
+    <clipPath id="left"><path d="M38 60 H82 V178 A22 22 0 0 1 38 178 Z"/></clipPath>
+    <clipPath id="middle"><path d="M106 60 H150 V178 A22 22 0 0 1 106 178 Z"/></clipPath>
+    <clipPath id="right"><path d="M174 60 H218 V178 A22 22 0 0 1 174 178 Z"/></clipPath>
+  </defs>
+
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+
+  <!-- Shelf -->
+  <rect x="22" y="212" width="212" height="10" rx="5" fill="#2c4a78"/>
+
+  <!-- Left tube: mixed colors -->
+  <g clip-path="url(#left)">
+    <rect x="38" y="168" width="44" height="40" fill="#e63946"/>
+    <rect x="38" y="136" width="44" height="32" fill="#ffd60a"/>
+    <rect x="38" y="104" width="44" height="32" fill="#7b2cbf"/>
+    <rect x="38" y="76" width="44" height="28" fill="#4cc9f0"/>
+    <rect x="38" y="60" width="44" height="152" fill="url(#shade)"/>
+  </g>
+
+  <!-- Middle tube: sorted into one color and corked -->
+  <g clip-path="url(#middle)">
+    <rect x="106" y="76" width="44" height="132" fill="#4cc9f0"/>
+    <rect x="106" y="60" width="44" height="152" fill="url(#shade)"/>
+  </g>
+  <rect x="111" y="36" width="34" height="30" rx="5" fill="#b07a4c"/>
+  <rect x="111" y="46" width="34" height="5" fill="#8a5a33"/>
+
+  <!-- Right tube: mixed colors -->
+  <g clip-path="url(#right)">
+    <rect x="174" y="168" width="44" height="40" fill="#7b2cbf"/>
+    <rect x="174" y="136" width="44" height="32" fill="#e63946"/>
+    <rect x="174" y="104" width="44" height="32" fill="#ffd60a"/>
+    <rect x="174" y="60" width="44" height="152" fill="url(#shade)"/>
+  </g>
+
+  <!-- Glass: outline, rim and shine -->
+  <g fill="none" stroke="#d7ebff" stroke-width="6" stroke-linejoin="round">
+    <path d="M35 58 V178 A25 25 0 0 0 85 178 V58"/>
+    <path d="M103 58 V178 A25 25 0 0 0 153 178 V58"/>
+    <path d="M171 58 V178 A25 25 0 0 0 221 178 V58"/>
+  </g>
+  <g fill="#d7ebff">
+    <rect x="29" y="52" width="62" height="9" rx="4.5"/>
+    <rect x="97" y="52" width="62" height="9" rx="4.5"/>
+    <rect x="165" y="52" width="62" height="9" rx="4.5"/>
+  </g>
+  <g stroke="#fff" stroke-opacity="0.55" stroke-width="5" stroke-linecap="round">
+    <line x1="47" y1="76" x2="47" y2="150"/>
+    <line x1="115" y1="88" x2="115" y2="150"/>
+    <line x1="183" y1="76" x2="183" y2="150"/>
+  </g>
 </svg>

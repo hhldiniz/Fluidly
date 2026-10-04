@@ -84,6 +84,9 @@ tests/run_tests.gd         Headless tests for the rules, solver and generator
 
 All graphics are drawn in code and all sounds are synthesized, so there are no external assets.
 
+The game icon is `icon.svg` (used for the browser tab and home-screen icons). `splash.png` is the same
+artwork rasterized at 256×256 for the loading screen; re-export it from `icon.svg` if you change the icon.
+
 ## Run locally
 
 1. Install [Godot 4.4.x](https://godotengine.org/download) (standard build, not .NET).
